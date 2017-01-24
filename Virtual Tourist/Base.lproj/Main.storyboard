@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="wtU-0e-TE4">
+            <objects>
+                <navigationController id="1Pe-d8-DQ8" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="fdb-fL-SpI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="nZV-ZR-Mcx" kind="relationship" relationship="rootViewController" id="tZI-u2-bf4"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gQF-0b-xYl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-425" y="102"/>
+        </scene>
+        <!--Map View Controller-->
+        <scene sceneID="PE2-Fh-vgZ">
+            <objects>
+                <viewController id="nZV-ZR-Mcx" userLabel="Map View Controller" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="wia-A8-XXv"/>
+                        <viewControllerLayoutGuide type="bottom" id="Z8h-8Y-JVY"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="3y1-s9-I5b">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="2dW-XO-L8O">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="2dW-XO-L8O" secondAttribute="trailing" id="8wn-ux-EUH"/>
+                            <constraint firstItem="Z8h-8Y-JVY" firstAttribute="top" secondItem="2dW-XO-L8O" secondAttribute="bottom" id="RBc-LG-ZZO"/>
+                            <constraint firstItem="2dW-XO-L8O" firstAttribute="top" secondItem="3y1-s9-I5b" secondAttribute="top" id="fnd-G1-RdJ"/>
+                            <constraint firstItem="2dW-XO-L8O" firstAttribute="leading" secondItem="3y1-s9-I5b" secondAttribute="leading" id="mUB-NA-dGj"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="bDT-Pf-Lox">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="pM0-yY-3T1"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oqC-lg-iLd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="604" y="107.49625187406298"/>
+        </scene>
+    </scenes>
+</document>
