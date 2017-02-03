@@ -15,6 +15,12 @@
 		042F819B1E3795E300A1FB1D /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F819A1E3795E300A1FB1D /* Virtual_TouristTests.swift */; };
 		042F81A61E3795E400A1FB1D /* Virtual_TouristUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81A51E3795E400A1FB1D /* Virtual_TouristUITests.swift */; };
 		042F81B81E37993E00A1FB1D /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 042F81B61E37993E00A1FB1D /* Model.xcdatamodeld */; };
+		042F81BD1E37AE9900A1FB1D /* Image+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81B91E37AE9800A1FB1D /* Image+CoreDataClass.swift */; };
+		042F81BE1E37AE9900A1FB1D /* Image+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81BA1E37AE9900A1FB1D /* Image+CoreDataProperties.swift */; };
+		042F81BF1E37AE9900A1FB1D /* Pin+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81BB1E37AE9900A1FB1D /* Pin+CoreDataClass.swift */; };
+		042F81C01E37AE9900A1FB1D /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81BC1E37AE9900A1FB1D /* Pin+CoreDataProperties.swift */; };
+		042F81C21E38286000A1FB1D /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81C11E38286000A1FB1D /* CoreDataStack.swift */; };
+		042F81C41E3829BE00A1FB1D /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81C31E3829BE00A1FB1D /* MapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +55,12 @@
 		042F81A51E3795E400A1FB1D /* Virtual_TouristUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristUITests.swift; sourceTree = "<group>"; };
 		042F81A71E3795E400A1FB1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		042F81B71E37993E00A1FB1D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		042F81B91E37AE9800A1FB1D /* Image+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Image+CoreDataClass.swift"; sourceTree = "<group>"; };
+		042F81BA1E37AE9900A1FB1D /* Image+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Image+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		042F81BB1E37AE9900A1FB1D /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
+		042F81BC1E37AE9900A1FB1D /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		042F81C11E38286000A1FB1D /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		042F81C31E3829BE00A1FB1D /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +145,11 @@
 		042F81B31E37960A00A1FB1D /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				042F81C11E38286000A1FB1D /* CoreDataStack.swift */,
+				042F81B91E37AE9800A1FB1D /* Image+CoreDataClass.swift */,
+				042F81BA1E37AE9900A1FB1D /* Image+CoreDataProperties.swift */,
+				042F81BB1E37AE9900A1FB1D /* Pin+CoreDataClass.swift */,
+				042F81BC1E37AE9900A1FB1D /* Pin+CoreDataProperties.swift */,
 				042F81B61E37993E00A1FB1D /* Model.xcdatamodeld */,
 			);
 			name = Model;
@@ -148,6 +165,7 @@
 		042F81B51E37961C00A1FB1D /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				042F81C31E3829BE00A1FB1D /* MapViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -220,6 +238,7 @@
 				TargetAttributes = {
 					042F81811E3795E300A1FB1D = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = M42UQ7H3R2;
 						ProvisioningStyle = Automatic;
 					};
 					042F81951E3795E300A1FB1D = {
@@ -287,8 +306,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				042F81881E3795E300A1FB1D /* ViewController.swift in Sources */,
+				042F81BE1E37AE9900A1FB1D /* Image+CoreDataProperties.swift in Sources */,
 				042F81861E3795E300A1FB1D /* AppDelegate.swift in Sources */,
+				042F81C01E37AE9900A1FB1D /* Pin+CoreDataProperties.swift in Sources */,
+				042F81C41E3829BE00A1FB1D /* MapViewController.swift in Sources */,
+				042F81BF1E37AE9900A1FB1D /* Pin+CoreDataClass.swift in Sources */,
 				042F81B81E37993E00A1FB1D /* Model.xcdatamodeld in Sources */,
+				042F81BD1E37AE9900A1FB1D /* Image+CoreDataClass.swift in Sources */,
+				042F81C21E38286000A1FB1D /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,7 +465,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = M42UQ7H3R2;
 				INFOPLIST_FILE = "Virtual Tourist/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.alder.Virtual-Tourist";
@@ -453,7 +478,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = M42UQ7H3R2;
 				INFOPLIST_FILE = "Virtual Tourist/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.alder.Virtual-Tourist";

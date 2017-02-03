@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="1Pe-d8-DQ8">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -28,7 +28,7 @@
         <!--Map View Controller-->
         <scene sceneID="PE2-Fh-vgZ">
             <objects>
-                <viewController id="nZV-ZR-Mcx" userLabel="Map View Controller" sceneMemberID="viewController">
+                <viewController id="nZV-ZR-Mcx" userLabel="Map View Controller" customClass="MapViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="wia-A8-XXv"/>
                         <viewControllerLayoutGuide type="bottom" id="Z8h-8Y-JVY"/>
@@ -44,14 +44,29 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="2dW-XO-L8O" secondAttribute="trailing" id="8wn-ux-EUH"/>
-                            <constraint firstItem="Z8h-8Y-JVY" firstAttribute="top" secondItem="2dW-XO-L8O" secondAttribute="bottom" id="RBc-LG-ZZO"/>
+                            <constraint firstItem="Z8h-8Y-JVY" firstAttribute="top" secondItem="2dW-XO-L8O" secondAttribute="bottom" id="UYC-lb-mK8"/>
                             <constraint firstItem="2dW-XO-L8O" firstAttribute="top" secondItem="3y1-s9-I5b" secondAttribute="top" id="fnd-G1-RdJ"/>
                             <constraint firstItem="2dW-XO-L8O" firstAttribute="leading" secondItem="3y1-s9-I5b" secondAttribute="leading" id="mUB-NA-dGj"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="bDT-Pf-Lox">
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="pM0-yY-3T1"/>
+                        <barButtonItem key="leftBarButtonItem" title="Delete" id="mVb-N1-uX4">
+                            <color key="tintColor" red="1" green="0.18333333330000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <action selector="deleteButton:" destination="nZV-ZR-Mcx" id="3An-UE-pss"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="pM0-yY-3T1">
+                            <connections>
+                                <action selector="editButton:" destination="nZV-ZR-Mcx" id="Qlx-k8-AVE"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="deleteButton" destination="mVb-N1-uX4" id="64E-zY-16C"/>
+                        <outlet property="editButton" destination="pM0-yY-3T1" id="6Xd-Ag-wZa"/>
+                        <outlet property="mapView" destination="2dW-XO-L8O" id="I8F-xJ-Rfm"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oqC-lg-iLd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
