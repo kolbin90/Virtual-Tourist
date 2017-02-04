@@ -1,0 +1,208 @@
+//
+//  FlickrClient.swift
+//  Virtual Tourist
+//
+//  Created by mac on 2/3/17.
+//  Copyright © 2017 Alder. All rights reserved.
+//
+
+import Foundation
+import UIKit
+
+class FlickrClient: NSObject {
+    
+    var session = URLSession.shared
+    
+
+    func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+    //creating serching box from long and lat
+        let minimumLon = max(Double(long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
+        let minimumLat = max(Double(lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
+        let maximumLon = min(Double(long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
+        let maximumLat = min(Double(lat) + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
+        let bbox =  "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
+        //creating array of methid parameters
+        let methodParameters = setMethodParameters(bbox: bbox)
+        //creating url for request
+        let url = flickrURLFromParameters(parameters: methodParameters)
+        displayImageFromFlickrBySearch(url: url) { (result, error) in
+            
+            
+            
+            completionHandler(result!, nil)
+        }
+    }
+    
+    
+    private func flickrURLFromParameters(parameters: [String:AnyObject]) -> URL {
+        let components = NSURLComponents()
+        components.scheme = Constants.Flickr.APIScheme
+        components.host = Constants.Flickr.APIHost
+        components.path = Constants.Flickr.APIPath
+        components.queryItems = [URLQueryItem]()
+        
+        for (key, value) in parameters {
+            let queryItem = URLQueryItem(name: key, value: "\(value)")
+            components.queryItems!.append(queryItem)
+        }
+        return components.url!
+    }
+    
+    
+    func setMethodParameters(bbox:String) -> [String : AnyObject] {
+        
+        //        setUIEnabled(false)
+        let methodParameters = [
+            Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
+            Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
+            Constants.FlickrParameterKeys.BoundingBox: bbox,
+            Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
+            Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
+            Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
+            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
+        ]
+        return methodParameters as [String : AnyObject]
+        //  displayImageFromFlickrBySearch(methodParameters: methodParameters as [String : AnyObject])
+    }
+    
+    
+    
+    
+    func displayImageFromFlickrBySearch(url: URL, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+        
+        // create session and reques)t
+        let request = URLRequest(url: url)
+        var dataArray = [NSData]()
+        
+        
+        // create network request
+        let task = session.dataTask(with: request) { (data, response, error) in
+            
+            // if an error occurs, print it and re-enable the UI
+            func displayError(error: String) {
+                print(error)
+                DispatchQueue.main.async {
+                    //  self.setUIEnabled(true)                }
+                }
+            }
+            /* GUARD: Was there an error? */
+            guard (error == nil) else {
+                displayError(error: "There was an error with your request: \(error)")
+                return
+            }
+            
+            /* GUARD: Did we get a successful 2XX response? */
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
+                displayError(error: "Your request returned a status code other than 2xx!")
+                return
+            }
+            
+            /* GUARD: Was there any data returned? */
+            guard let data = data else {
+                displayError(error: "No data was returned by the request!")
+                return
+            }
+            
+            // parse the data
+            self.convertDataWithCompletionHandler(data: data) { (result, error) in
+                guard (error == nil) else {
+                 //    completionHandler(nil, "Data error. Try again later")
+                    return
+                }
+                guard let result = result else {
+                //    completionHandler(nil,"Data error. Try again later")
+                    return
+                }
+                guard let photosDictionary = result[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+                    displayError(error: "Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(result)")
+                    return
+                }
+                /* GUARD: Is "pages" key in the photosDictionary? */
+                guard let totalPages = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
+                    displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photosDictionary)")
+                    return
+                }
+                guard let photosArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
+                    displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(photosDictionary)")
+                    return
+                }
+                
+                if photosArray.count == 0 {
+                    displayError(error: "No Photos Found. Search Again.")
+                    return
+                } else {
+                    var numOfPicForDownload = 21
+                    if photosArray.count < numOfPicForDownload {
+                        numOfPicForDownload = photosArray.count
+                    }
+                    var num = 1
+                    while num < numOfPicForDownload {
+                        
+                        
+                        // let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
+                        let photoDictionary = photosArray[num] as [String: AnyObject]
+                        let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
+                        print(photoTitle)
+                        
+                        /* GUARD: Does our photo have a key for 'url_m'? */
+                        guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
+                            displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
+                            return
+                        }
+                        print(imageUrlString)
+                        let imageURL = URL(string: imageUrlString)
+                        
+                        
+                        
+                        
+                        
+                        
+                        if let imageData = NSData(contentsOf: imageURL!) {
+                            
+                                dataArray.append(imageData)
+                                
+                        
+                        } else {
+                            displayError(error: "Image does not exist at \(imageURL)")
+                        }
+                        
+                        num += 1
+                    }
+                    completionHandler(dataArray, nil)
+
+                    
+                }
+                
+                
+                
+            }
+        }
+        task.resume()
+        // start the task!
+    }
+    
+    // MARK: - assist functions
+    func convertDataWithCompletionHandler(data: Data, completionHandlerForConvertData: (_ result: AnyObject?, _ error: NSError?) -> Void) {
+        var parsedResult: AnyObject! = nil
+        do {
+            parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
+        } catch {
+            let userInfo = [NSLocalizedDescriptionKey : "Could not parse the data as JSON: '\(data)'"]
+            completionHandlerForConvertData(nil, NSError(domain: "convertDataWithCompletionHandler", code: 1, userInfo: userInfo))
+        }
+        completionHandlerForConvertData(parsedResult, nil)
+    }
+    
+    // MARK: -  Singleton
+    
+    class func sharedInstance() -> FlickrClient {
+        struct Singleton {
+            static var sharedInstance = FlickrClient()
+        }
+        return Singleton.sharedInstance
+    }
+    
+    
+    
+    
+}

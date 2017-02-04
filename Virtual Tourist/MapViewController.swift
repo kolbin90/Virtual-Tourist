@@ -122,7 +122,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 pinsForDeletion.append(newAnnotation)
             }
             setTitleForDelete(done: false)
-            mapView.deselectAnnotation(didSelect.annotation, animated: true)
         }
         /*
          let controller = storyboard?.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
@@ -135,6 +134,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
          
          controller.pin = (view.annotation as! PinAnnotation).pin
          navigationController?.pushViewController(controller, animated: true) */
+        mapView.deselectAnnotation(didSelect.annotation, animated: true)
+
     }
     
     
@@ -205,11 +206,20 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let lat = Float(newCoordinates.latitude)
             let long = Float(newCoordinates.longitude)
             Pin(long: long, lat: lat, context: stack.context)
-            stack.save()
             let annotation = MKPointAnnotation()
-            
             annotation.coordinate = newCoordinates
             self.mapView.addAnnotation(annotation)
+            
+            
+            FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
+                print("Vodnikov LLIac \(result?.count)")
+
+            
+            
+            }
+            //print("Vodnikov LLIac \(imagesDataArray.count)")
+            stack.save()
+            
             
         }
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
