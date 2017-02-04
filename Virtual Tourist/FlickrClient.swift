@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import MapKit
 
 class FlickrClient: NSObject {
     
@@ -15,7 +16,7 @@ class FlickrClient: NSObject {
     
 
     func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
-    //creating serching box from long and lat
+        //creating serching box from long and lat
         let minimumLon = max(Double(long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
         let minimumLat = max(Double(lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
         let maximumLon = min(Double(long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
@@ -135,7 +136,7 @@ class FlickrClient: NSObject {
                     if photosArray.count < numOfPicForDownload {
                         numOfPicForDownload = photosArray.count
                     }
-                    var num = 1
+                    var num = 0
                     while num < numOfPicForDownload {
                         
                         
@@ -151,11 +152,7 @@ class FlickrClient: NSObject {
                         }
                         print(imageUrlString)
                         let imageURL = URL(string: imageUrlString)
-                        
-                        
-                        
-                        
-                        
+            
                         
                         if let imageData = NSData(contentsOf: imageURL!) {
                             
@@ -192,6 +189,8 @@ class FlickrClient: NSObject {
         }
         completionHandlerForConvertData(parsedResult, nil)
     }
+    
+    
     
     // MARK: -  Singleton
     

@@ -17,7 +17,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     var editingMode = false
     var dropingPin = true
     var unselected = true
-    var pinsForDeletion = [MKAnnotation]()
+    var pandasForDelition = [PinAndAnnotation]() // panda = PinANDAnnotation
+    //var pinsForDeletion = [MKPinAnnotationView]()
+    //var annotationsForDeletion = [MKAnnotation]()
     
     // MARK: - Outlets
     @IBOutlet weak var mapView: MKMapView!
@@ -29,6 +31,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self // MKMapViewDelegate
+        mapView.removeAnnotations(mapView.annotations)
         setTitleForDelete(done: false)
         if UserDefaults.standard.bool(forKey: "HasLaunchedBefore") {
             loadMapRegion()
@@ -60,47 +63,19 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     // Here we create a view
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if editingMode {
-            if unselected {
-                let reuseId = "redPin"
-                var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-                if pinView == nil {
-                    pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-                    pinView!.animatesDrop = false
-                    pinView?.pinTintColor = .red
-                }
-                else {
-                    pinView!.annotation = annotation
-                }
-                return pinView
-                
-            } else {
-                let reuseId = "purplePin"
-                var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-                if pinView == nil {
-                    pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-                    pinView!.animatesDrop = false
-                    pinView?.pinTintColor = .purple
-                }
-                else {
-                    pinView!.annotation = annotation
-                }
-                unselected = true
-                return pinView
-            }
-        } else {
-            let reuseId = "purpleDropPin"
-            var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-            if pinView == nil {
-                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-                pinView!.animatesDrop = true
-                pinView?.pinTintColor = .purple
-            }
-            else {
-                pinView!.annotation = annotation
-            }
-            return pinView
+        let reuseId = "purpleDropPin"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.animatesDrop = true
+            pinView!.pinTintColor = .purple
         }
+        else {
+            pinView!.annotation = annotation
+            pinView!.pinTintColor = .purple
+            
+        }
+        return pinView
     }
     
     
@@ -112,30 +87,41 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     // Check of pin was selected
     func mapView(_ mapView: MKMapView, didSelect: MKAnnotationView) {
         if editingMode {
-            let newAnnotation = didSelect.annotation!
-            let oldAnnotationView = didSelect as? MKPinAnnotationView
-            if oldAnnotationView?.pinTintColor == UIColor.red {
-                unSelectPin(annotation: newAnnotation)
+            guard let pin = didSelect as? MKPinAnnotationView else {
+                return
+            }
+            
+            
+            if pin.pinTintColor == UIColor.red {
+                pin.pinTintColor = .purple
+                for (index,pandaForDelition) in pandasForDelition.enumerated() {
+                    let annotation = pandaForDelition.annotation
+                    if (annotation.coordinate.latitude == pin.annotation!.coordinate.latitude) && (annotation.coordinate.longitude == pin.annotation!.coordinate.longitude) {
+                        pandasForDelition.remove(at: index)
+                    }
+                }
             } else {
-                mapView.removeAnnotation(didSelect.annotation!)
-                mapView.addAnnotation(newAnnotation)
-                pinsForDeletion.append(newAnnotation)
+                let onePanda:PinAndAnnotation = PinAndAnnotation(pinAnnotationView: pin)
+                pandasForDelition.append(onePanda)
+                pin.pinTintColor = .red
             }
             setTitleForDelete(done: false)
-        }
-        /*
-         let controller = storyboard?.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
+            mapView.deselectAnnotation(didSelect.annotation, animated: true)
+
+        } else {
+        
+         let controller = storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
          
          // signal to cancel download in case there is a download in progress in background thread
-         cancelDownload = true
+         //cancelDownload = true
          
          // deselect the pin so we can comeback and select it again
-         mapView.deselectAnnotation(view.annotation, animated: true)
+            mapView.deselectAnnotation(didSelect.annotation, animated: true)
          
-         controller.pin = (view.annotation as! PinAnnotation).pin
-         navigationController?.pushViewController(controller, animated: true) */
-        mapView.deselectAnnotation(didSelect.annotation, animated: true)
-
+         controller.pin = didSelect.annotation
+         navigationController?.pushViewController(controller, animated: true)
+            
+        }
     }
     
     
@@ -168,22 +154,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     // MARK: - Annotations
     
     
-    func unSelectPin(annotation:MKAnnotation) {
-        
-        var newAnnotation = annotation
-        
-        mapView.removeAnnotation(annotation)
-        unselected = false
-        mapView.addAnnotation(newAnnotation)
-        for (index,pin) in pinsForDeletion.enumerated() {
-            if (pin.coordinate.latitude == newAnnotation.coordinate.latitude) && (pin.coordinate.longitude == newAnnotation.coordinate.longitude) {
-                pinsForDeletion.remove(at: index)
-            }
-        }
-        
-        
-        setTitleForDelete(done: false)
-    }
     
     
     
@@ -200,6 +170,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         guard editingMode == false else {
             return
         }
+        
         if gestureRecognizer.state == UIGestureRecognizerState.began {
             let touchPoint = gestureRecognizer.location(in: self.mapView)
             let newCoordinates = self.mapView.convert(touchPoint, toCoordinateFrom: self.mapView)
@@ -212,16 +183,17 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             
             
             FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
+                
+                
                 print("Vodnikov LLIac \(result?.count)")
-
-            
-            
+                if let result = result {
+                    self.saveToCore(imagesData: result, forPin: annotation)
+                }
             }
-            //print("Vodnikov LLIac \(imagesDataArray.count)")
             stack.save()
-            
-            
         }
+        
+        
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
             // drag = false
         }
@@ -231,7 +203,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     func getAnnotationsFromCore() {
         do {
             let pins = try stack.context.fetch(Pin.fetchRequest()) as [Pin]
-            var annotations = [MKPointAnnotation()]
+            var annotations = [MKPointAnnotation]()
             for pin in pins {
                 let annotation = MKPointAnnotation()
                 annotation.coordinate.latitude = Double(pin.lat)
@@ -245,8 +217,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
     
     func deleteAnnotationsFromCore() {
-        for annotation in pinsForDeletion {
-            //let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Pin.fetchRequest()
+        let annotationsForDeletion = pandaToAnnotation(pandas: pandasForDelition)
+        for annotation in annotationsForDeletion {
             let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
             let coordinates = [Float(annotation.coordinate.latitude),Float(annotation.coordinate.longitude)]
             let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
@@ -270,9 +242,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     // MARK: - Actions
     
     @IBAction func deleteButton(_ sender: Any) {
-        mapView.removeAnnotations(pinsForDeletion)
+        
+        mapView.removeAnnotations(pandaToAnnotation(pandas: pandasForDelition))
         deleteAnnotationsFromCore()
-        pinsForDeletion = []
+        pandasForDelition = []
         setTitleForDelete(done: false)
     }
     
@@ -285,16 +258,54 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             editButton.title = "Done"
             
         } else {
-            let deleteArray = pinsForDeletion
+            let deleteArray = pandaToPin(pandas: pandasForDelition) // TODO function [panda] =>
             for pin in deleteArray {
-                unSelectPin(annotation: pin)
+                pin.pinTintColor = .purple
             }
+            pandasForDelition = []
             editButton.title = "Edit"
             setTitleForDelete(done:true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.editingMode = false
             }
             
+        }
+    }
+    
+    
+    func pandaToAnnotation(pandas: [PinAndAnnotation]) -> [MKAnnotation] {
+        var annotations = [MKAnnotation]()
+        for panda in pandas {
+            let annotation = panda.annotation
+            annotations.append(annotation)
+        }
+        return annotations
+    }
+    
+    func pandaToPin(pandas: [PinAndAnnotation]) -> [MKPinAnnotationView] {
+        var pins = [MKPinAnnotationView]()
+        for panda in pandas {
+            let pin = panda.pin
+            pins.append(pin)
+        }
+        return pins
+    }
+    
+    func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let coordinates = [Float(forPin.coordinate.latitude),Float(forPin.coordinate.longitude)]
+        let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
+        fr.predicate = predicate
+        if let result = try? stack.context.fetch(fr) {
+            for object in result {
+                for imageData in imagesDataArray {
+                    let image = Image.init(imageData: imageData as Data, context: stack.context) as Image
+                    image.toPin = object as! Pin
+                }
+                stack.save()
+            }
+        } else {
+            print("error with fetching")
         }
     }
     
@@ -306,7 +317,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         } else {
             if editingMode {
                 deleteButton.isEnabled = true
-                deleteButton.title! = "Delete(\(pinsForDeletion.count))"
+                deleteButton.title! = "Delete(\(pandasForDelition.count))"
             } else {
                 deleteButton.title! = "Delete"
                 deleteButton.isEnabled = false
