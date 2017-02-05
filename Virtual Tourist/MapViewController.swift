@@ -180,17 +180,27 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             self.mapView.addAnnotation(annotation)
-            
-            
             FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
+                print("Vodnikov LLIac \(result?.count)")
+                DispatchQueue.main.async {
+                    if let result = result {
+                        print("oi oi oi OLLIu6ka")
+                        FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: annotation)
+                        self.stack.save()
+
+                    }
+                }
+            }
+            
+         /*   FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
                 
                 
                 print("Vodnikov LLIac \(result?.count)")
                 if let result = result {
-                    self.saveToCore(imagesData: result, forPin: annotation)
+                    FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: annotation)
                 }
             }
-            stack.save()
+            stack.save() */
         }
         
         
@@ -291,24 +301,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         return pins
     }
     
-    func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
-        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let coordinates = [Float(forPin.coordinate.latitude),Float(forPin.coordinate.longitude)]
-        let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
-        fr.predicate = predicate
-        if let result = try? stack.context.fetch(fr) {
-            for object in result {
-                for imageData in imagesDataArray {
-                    let image = Image.init(imageData: imageData as Data, context: stack.context) as Image
-                    image.toPin = object as! Pin
-                }
-                stack.save()
-            }
-        } else {
-            print("error with fetching")
-        }
-    }
-    
+
     
     func setTitleForDelete(done:Bool) {
         if done {

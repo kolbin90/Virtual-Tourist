@@ -101,13 +101,27 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="jvP-q5-0eT">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="jvP-q5-0eT" customClass="PhotoAlbumCell" customModule="Virtual_Tourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="106" height="92"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="106" height="92"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qR1-f9-uJL">
+                                                    <rect key="frame" x="8" y="-18" width="90" height="128"/>
+                                                </imageView>
+                                            </subviews>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="qR1-f9-uJL" firstAttribute="leading" secondItem="jvP-q5-0eT" secondAttribute="leading" id="Mkk-Io-eZ7"/>
+                                            <constraint firstItem="qR1-f9-uJL" firstAttribute="top" secondItem="jvP-q5-0eT" secondAttribute="top" id="TsT-ps-tHy"/>
+                                            <constraint firstAttribute="trailing" secondItem="qR1-f9-uJL" secondAttribute="trailing" id="YTc-ug-nul"/>
+                                            <constraint firstAttribute="bottom" secondItem="qR1-f9-uJL" secondAttribute="bottom" id="ppK-oP-B8D"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="imageCell" destination="qR1-f9-uJL" id="LAN-7c-D7T"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -131,19 +145,24 @@
                                     <action selector="editButton:" destination="ZVr-Kf-qGO" id="0vG-P6-eOr"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Delete" id="BEK-cr-WXg">
+                            <barButtonItem enabled="NO" title="Reload" id="BEK-cr-WXg">
                                 <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="reloadButton:" destination="ZVr-Kf-qGO" id="QTA-7G-d2N"/>
+                                </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="collectionView" destination="Hgn-zA-T8J" id="CUS-W5-eH7"/>
                         <outlet property="editButton" destination="FMX-Fr-Yam" id="qgq-2K-bj3"/>
                         <outlet property="mapView" destination="0Bs-Q7-Fxb" id="Ra7-pC-nzQ"/>
+                        <outlet property="reloadButton" destination="BEK-cr-WXg" id="ngm-el-KQE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PoV-1u-2xe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="333.60000000000002" y="757.87106446776613"/>
+            <point key="canvasLocation" x="330" y="902"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="k0G-Q5-lkp">
@@ -159,7 +178,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="a2O-ia-STB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-426" y="748"/>
+            <point key="canvasLocation" x="-426" y="902"/>
         </scene>
     </scenes>
 </document>

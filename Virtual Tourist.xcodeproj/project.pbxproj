@@ -24,6 +24,7 @@
 		049718181E451B7E001F4F7D /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049718171E451B7D001F4F7D /* FlickrClient.swift */; };
 		0497181A1E451C0A001F4F7D /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049718191E451C0A001F4F7D /* FlickrConstants.swift */; };
 		04A137C91E46587B0000F597 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A137C81E46587A0000F597 /* PhotoAlbumViewController.swift */; };
+		04A137CB1E4685580000F597 /* PhotoAlbumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A137CA1E4685570000F597 /* PhotoAlbumCell.swift */; };
 		04FF84781E4581A20076CEB7 /* PinAndAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FF84771E4581A20076CEB7 /* PinAndAnnotation.swift */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +69,7 @@
 		049718171E451B7D001F4F7D /* FlickrClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
 		049718191E451C0A001F4F7D /* FlickrConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConstants.swift; sourceTree = "<group>"; };
 		04A137C81E46587A0000F597 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
+		04A137CA1E4685570000F597 /* PhotoAlbumCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumCell.swift; sourceTree = "<group>"; };
 		04FF84771E4581A20076CEB7 /* PinAndAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinAndAnnotation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -172,6 +174,7 @@
 			children = (
 				042F81C31E3829BE00A1FB1D /* MapViewController.swift */,
 				04A137C81E46587A0000F597 /* PhotoAlbumViewController.swift */,
+				04A137CA1E4685570000F597 /* PhotoAlbumCell.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -339,6 +342,7 @@
 				042F81BE1E37AE9900A1FB1D /* Image+CoreDataProperties.swift in Sources */,
 				0497181A1E451C0A001F4F7D /* FlickrConstants.swift in Sources */,
 				042F81861E3795E300A1FB1D /* AppDelegate.swift in Sources */,
+				04A137CB1E4685580000F597 /* PhotoAlbumCell.swift in Sources */,
 				042F81C01E37AE9900A1FB1D /* Pin+CoreDataProperties.swift in Sources */,
 				04FF84781E4581A20076CEB7 /* PinAndAnnotation.swift in Sources */,
 				042F81C41E3829BE00A1FB1D /* MapViewController.swift in Sources */,

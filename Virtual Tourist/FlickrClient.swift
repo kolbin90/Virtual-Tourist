@@ -6,13 +6,15 @@
 //  Copyright © 2017 Alder. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import MapKit
+import CoreData
 
 class FlickrClient: NSObject {
     
     var session = URLSession.shared
+    let stack = (UIApplication.shared.delegate as! AppDelegate).stack
+
     
 
     func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
@@ -188,6 +190,25 @@ class FlickrClient: NSObject {
             completionHandlerForConvertData(nil, NSError(domain: "convertDataWithCompletionHandler", code: 1, userInfo: userInfo))
         }
         completionHandlerForConvertData(parsedResult, nil)
+    }
+    
+    
+    func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let coordinates = [Float(forPin.coordinate.latitude),Float(forPin.coordinate.longitude)]
+        let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
+        fr.predicate = predicate
+        if let result = try? stack.context.fetch(fr) {
+            for object in result {
+                for imageData in imagesDataArray {
+                    let image = Image.init(imageData: imageData as Data, context: stack.context) as Image
+                    image.toPin = object as? Pin
+                }
+                stack.save()
+            }
+        } else {
+            print("error with fetching")
+        }
     }
     
     
