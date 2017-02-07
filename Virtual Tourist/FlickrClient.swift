@@ -140,12 +140,9 @@ class FlickrClient: NSObject {
                     }
                     var num = 0
                     while num < numOfPicForDownload {
-                        
-                        
-                        // let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
                         let photoDictionary = photosArray[num] as [String: AnyObject]
                         let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                        print(photoTitle)
+                        print(photoTitle ?? <#default value#>)
                         
                         /* GUARD: Does our photo have a key for 'url_m'? */
                         guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
@@ -154,30 +151,18 @@ class FlickrClient: NSObject {
                         }
                         print(imageUrlString)
                         let imageURL = URL(string: imageUrlString)
-            
-                        
                         if let imageData = NSData(contentsOf: imageURL!) {
-                            
                                 dataArray.append(imageData)
-                                
-                        
                         } else {
                             displayError(error: "Image does not exist at \(imageURL)")
                         }
-                        
                         num += 1
                     }
                     completionHandler(dataArray, nil)
-
-                    
                 }
-                
-                
-                
             }
         }
         task.resume()
-        // start the task!
     }
     
     // MARK: - assist functions

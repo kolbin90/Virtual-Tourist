@@ -22,14 +22,8 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     var updatedIndexPaths: [IndexPath]!
     var pinForImages:Pin!
     var editingMode = false
-    var imagesForDelition:[Image]!
-
-    
     var fetchedResultsController: NSFetchedResultsController<Image>!
 
-    
-    
-    
     // MARK: - Oulets
     
     @IBOutlet weak var reloadButton: UIBarButtonItem!
@@ -37,17 +31,12 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     @IBOutlet weak var editButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
     
-
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.showAnnotations([pin!], animated: true)
-        collectionView.dataSource = self
-        collectionView.delegate = self
         pinForImages = findPin()!
-
         fetchedResultsController = {
             let fetchRequest: NSFetchRequest<Image> = Image.fetchRequest()
             let predicate = NSPredicate.init(format: "toPin == %@", argumentArray: [pinForImages])
@@ -58,17 +47,14 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
             frc.delegate = self
             return frc
         }()
-        
         do {
             try fetchedResultsController.performFetch()
         }
         catch let error as NSError {
             print("An error occured \(error) \(error.userInfo)")
         }
-        
-        
-        
     }
+    
     // MARK: - Controller Delegate
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         // We are about to handle some new changes. Start out with empty arrays for each change type
@@ -116,22 +102,18 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         }
     }
     
-    
     // MARK: - CollectionView delegate
-    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let sections = fetchedResultsController.sections {
             let sectionInfo = sections[section]
             return sectionInfo.numberOfObjects
         }
-       
         return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-        
         configureCell(cell as! PhotoAlbumCell, atIndexPath: indexPath)
         return cell
     }
@@ -139,14 +121,8 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if editingMode {
             let selectedImage = fetchedResultsController.object(at: indexPath)
-            if let index = imagesForDelition.indexOf(indexPath) {
-                selectedIndexes.removeAtIndex(index)
-            } else {
-                selectedIndexes.append(indexPath)
-            }
-            imagesForDelition.append(selectedImage)
-            //stack.context.delete(selectedImage)
-            //stack.save()
+            stack.context.delete(selectedImage)
+            stack.save()
         }
     }
     
@@ -171,11 +147,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         }
     }
     
-
-    
-    
     func newData() {
-        
         pinForImages.removeFromToImage(pinForImages.toImage!)
         FlickrClient.sharedInstance().getImagesFromFlickr(long: Float(pin.coordinate.longitude), lat: Float(pin.coordinate.latitude)) { (result, error) in
             print("Vodnikov LLIac \(result?.count)")
@@ -184,16 +156,10 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
                     print("oi oi oi OLLIu6ka")
                     FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: self.pin)
                     self.stack.save()
-                    
                 }
             }
         }
     }
-    
-    
-    
-    
-    
     
     // MARK:- Actions
     
@@ -208,9 +174,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         } else {
             editingMode = true
             editButton.title = "Done"
-
         }
             reloadButton.isEnabled = editingMode
     }
-    
 }

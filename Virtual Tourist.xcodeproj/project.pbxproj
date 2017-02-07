@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		042F81861E3795E300A1FB1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81851E3795E300A1FB1D /* AppDelegate.swift */; };
-		042F81881E3795E300A1FB1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F81871E3795E300A1FB1D /* ViewController.swift */; };
 		042F818B1E3795E300A1FB1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 042F81891E3795E300A1FB1D /* Main.storyboard */; };
 		042F818D1E3795E300A1FB1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 042F818C1E3795E300A1FB1D /* Assets.xcassets */; };
 		042F81901E3795E300A1FB1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 042F818E1E3795E300A1FB1D /* LaunchScreen.storyboard */; };
@@ -48,7 +47,6 @@
 /* Begin PBXFileReference section */
 		042F81821E3795E300A1FB1D /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		042F81851E3795E300A1FB1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		042F81871E3795E300A1FB1D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		042F818A1E3795E300A1FB1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		042F818C1E3795E300A1FB1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		042F818F1E3795E300A1FB1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -125,7 +123,6 @@
 				042F81B41E37961500A1FB1D /* View */,
 				042F81B31E37960A00A1FB1D /* Model */,
 				042F81851E3795E300A1FB1D /* AppDelegate.swift */,
-				042F81871E3795E300A1FB1D /* ViewController.swift */,
 				042F81891E3795E300A1FB1D /* Main.storyboard */,
 				042F818C1E3795E300A1FB1D /* Assets.xcassets */,
 				042F818E1E3795E300A1FB1D /* LaunchScreen.storyboard */,
@@ -336,7 +333,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				042F81881E3795E300A1FB1D /* ViewController.swift in Sources */,
 				049718181E451B7E001F4F7D /* FlickrClient.swift in Sources */,
 				04A137C91E46587B0000F597 /* PhotoAlbumViewController.swift in Sources */,
 				042F81BE1E37AE9900A1FB1D /* Image+CoreDataProperties.swift in Sources */,
