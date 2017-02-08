@@ -17,7 +17,7 @@ class FlickrClient: NSObject {
 
     
 
-    func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+    func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
         //creating serching box from long and lat
         let minimumLon = max(Double(long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
         let minimumLat = max(Double(lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
@@ -54,7 +54,6 @@ class FlickrClient: NSObject {
     
     func setMethodParameters(bbox:String) -> [String : AnyObject] {
         
-        //        setUIEnabled(false)
         let methodParameters = [
             Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
             Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
@@ -71,11 +70,11 @@ class FlickrClient: NSObject {
     
     
     
-    func displayImageFromFlickrBySearch(url: URL, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+    func displayImageFromFlickrBySearch(url: URL, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
         
         // create session and reques)t
         let request = URLRequest(url: url)
-        var dataArray = [NSData]()
+        var urlArray = [String]()
         
         
         // create network request
@@ -142,7 +141,7 @@ class FlickrClient: NSObject {
                     while num < numOfPicForDownload {
                         let photoDictionary = photosArray[num] as [String: AnyObject]
                         let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                        print(photoTitle ?? <#default value#>)
+                        print(photoTitle)
                         
                         /* GUARD: Does our photo have a key for 'url_m'? */
                         guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
@@ -150,15 +149,10 @@ class FlickrClient: NSObject {
                             return
                         }
                         print(imageUrlString)
-                        let imageURL = URL(string: imageUrlString)
-                        if let imageData = NSData(contentsOf: imageURL!) {
-                                dataArray.append(imageData)
-                        } else {
-                            displayError(error: "Image does not exist at \(imageURL)")
-                        }
+                        urlArray.append(imageUrlString)
                         num += 1
                     }
-                    completionHandler(dataArray, nil)
+                    completionHandler(urlArray, nil)
                 }
             }
         }
