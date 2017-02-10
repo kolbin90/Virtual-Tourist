@@ -142,7 +142,7 @@ class FlickrClient: NSObject {
                     while num < numOfPicForDownload {
                         let photoDictionary = photosArray[num] as [String: AnyObject]
                         let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                        print(photoTitle ?? <#default value#>)
+                        print(photoTitle)
                         
                         /* GUARD: Does our photo have a key for 'url_m'? */
                         guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
