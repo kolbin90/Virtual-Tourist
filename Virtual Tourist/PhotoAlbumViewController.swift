@@ -26,6 +26,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
 
     // MARK: - Oulets
     
+    @IBOutlet weak var label: UILabel!
     @IBOutlet weak var reloadButton: UIBarButtonItem!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var editButton: UIBarButtonItem!
@@ -107,14 +108,21 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let sections = fetchedResultsController.sections {
             let sectionInfo = sections[section]
+            if sectionInfo.numberOfObjects > 0 {
+                label.isHidden = true
+                print(sectionInfo.numberOfObjects)
+            } else {
+                label.isHidden = false
+                print(sectionInfo.numberOfObjects)
+            }
             return sectionInfo.numberOfObjects
         }
         return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-        configureCell(cell as! PhotoAlbumCell, atIndexPath: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)  as! PhotoAlbumCell
+        configureCell(cell, atIndexPath: indexPath)
         return cell
     }
     
@@ -130,8 +138,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     func configureCell(_ cell: PhotoAlbumCell, atIndexPath indexPath: IndexPath) {
         let image = fetchedResultsController.object(at: indexPath)
-        let imageData = image.imageData!
-        cell.imageCell!.image = UIImage(data: imageData)
+        if let imageData = image.imageData {
+            cell.imageCell!.image = UIImage(data: imageData)
+        } else {
+            cell.imageCell!.image = #imageLiteral(resourceName: "placeholder")
+        }
     }
     
     func findPin() -> Pin? {
@@ -149,16 +160,17 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     func newData() {
         pinForImages.removeFromToImage(pinForImages.toImage!)
-        FlickrClient.sharedInstance().getImagesFromFlickr(long: Float(pin.coordinate.longitude), lat: Float(pin.coordinate.latitude)) { (result, error) in
+        FlickrClient.sharedInstance().getImagesFromFlickr(pin: pinForImages) { (result, error) in
             print("Vodnikov LLIac \(result?.count)")
             DispatchQueue.main.async {
                 if let result = result {
                     print("oi oi oi OLLIu6ka")
-                    FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: self.pin)
+                    FlickrClient.sharedInstance().getImagesDataFor(pin: self.pinForImages)
                     self.stack.save()
                 }
             }
         }
+
     }
     
     // MARK:- Actions

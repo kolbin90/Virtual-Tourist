@@ -17,21 +17,22 @@ class FlickrClient: NSObject {
 
     
 
-    func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
+    func getImagesFromFlickr(pin:Pin, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
+        
         //creating serching box from long and lat
-        let minimumLon = max(Double(long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
-        let minimumLat = max(Double(lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
-        let maximumLon = min(Double(long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
-        let maximumLat = min(Double(lat) + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
+        let minimumLon = max(Double(pin.long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
+        let minimumLat = max(Double(pin.lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
+        let maximumLon = min(Double(pin.long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
+        let maximumLat = min(Double(pin.lat) + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
         let bbox =  "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
         //creating array of methid parameters
         let methodParameters = setMethodParameters(bbox: bbox)
         //creating url for request
         let url = flickrURLFromParameters(parameters: methodParameters)
-        displayImageFromFlickrBySearch(url: url) { (result, error) in
+        getImagesURLandSetImageObjects(url: url, pin: pin) { (result, error) in
             
             
-            
+            self.getImagesDataFor(pin: pin)
             completionHandler(result!, nil)
         }
     }
@@ -70,7 +71,7 @@ class FlickrClient: NSObject {
     
     
     
-    func displayImageFromFlickrBySearch(url: URL, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
+    func getImagesURLandSetImageObjects(url: URL,pin:Pin, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
         
         // create session and reques)t
         let request = URLRequest(url: url)
@@ -149,9 +150,12 @@ class FlickrClient: NSObject {
                             return
                         }
                         print(imageUrlString)
+                        var newImage = Image.init(imageURL: imageUrlString, imageData: nil, context: self.stack.context)
+                        newImage.toPin = pin
                         urlArray.append(imageUrlString)
                         num += 1
                     }
+                    self.stack.save()
                     completionHandler(urlArray, nil)
                 }
             }
@@ -172,7 +176,7 @@ class FlickrClient: NSObject {
     }
     
     
-    func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
+ /*   func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
         let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         let coordinates = [Float(forPin.coordinate.latitude),Float(forPin.coordinate.longitude)]
         let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
@@ -180,17 +184,42 @@ class FlickrClient: NSObject {
         if let result = try? stack.context.fetch(fr) {
             for object in result {
                 for imageData in imagesDataArray {
-                    let image = Image.init(imageData: imageData as Data, context: stack.context) as Image
+                    let image = Image.//Image.init(imageData: imageData as Data, context: stack.context) as Image
                     image.toPin = object as? Pin
+                    
                 }
                 stack.save()
             }
         } else {
             print("error with fetching")
         }
+     } */
+    
+    
+    func getImagesDataFor(pin:Pin) {
+        let imagesArray = Array(pin.toImage!)
+        for image in imagesArray {
+            getImageDataFor(image: image as! Image)
+        }
     }
     
-    
+    func getImageDataFor(image:Image) {
+        let url = URL(string: image.imageURL)!
+        let request = URLRequest(url: url)
+        let task = session.dataTask(with: request) { (data, response, error) in
+            guard (error == nil) else {
+                print("There was an error with the task for image")
+                return
+            }
+            guard let data = data else {
+                print("data error")
+                return
+            }
+            image.imageData = data
+            self.stack.save()
+        }
+        task.resume()
+    }
     
     // MARK: -  Singleton
     

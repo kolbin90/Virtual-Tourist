@@ -42,12 +42,12 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         getAnnotationsFromCore()
         
         
-        /* do{
+        do{
          try stack.dropAllData()
          mapView.removeAnnotations(mapView.annotations)
          } catch {
          print("Error droping all objects in DB")
-         }*/
+         }
     }
     
     // MARK: - MKMapViewDelegate
@@ -137,16 +137,17 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let newCoordinates = self.mapView.convert(touchPoint, toCoordinateFrom: self.mapView)
             let lat = Float(newCoordinates.latitude)
             let long = Float(newCoordinates.longitude)
-            Pin(long: long, lat: lat, context: stack.context)
             let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             self.mapView.addAnnotation(annotation)
-            FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
+            let newPin = Pin(long: long, lat: lat, context: stack.context)
+            stack.save()
+            FlickrClient.sharedInstance().getImagesFromFlickr(pin: newPin) { (result, error) in
                 print("Vodnikov LLIac \(result?.count)")
                 DispatchQueue.main.async {
                     if let result = result {
                         print("oi oi oi OLLIu6ka")
-                        FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: annotation)
+                        FlickrClient.sharedInstance().getImagesDataFor(pin: newPin)
                         self.stack.save()
 
                     }
