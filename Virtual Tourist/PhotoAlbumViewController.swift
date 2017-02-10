@@ -20,12 +20,14 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     var insertedIndexPaths: [IndexPath]!
     var deletedIndexPaths: [IndexPath]!
     var updatedIndexPaths: [IndexPath]!
+    var selectedIndexPaths = [IndexPath]()
     var pinForImages:Pin!
     var editingMode = false
     var fetchedResultsController: NSFetchedResultsController<Image>!
 
     // MARK: - Oulets
     
+    @IBOutlet weak var deleteButton: UIBarButtonItem!
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var reloadButton: UIBarButtonItem!
     @IBOutlet weak var mapView: MKMapView!
@@ -37,7 +39,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.showAnnotations([pin!], animated: true)
-        pinForImages = findPin()!
+        pinForImages = findPinInCoreData()
         fetchedResultsController = {
             let fetchRequest: NSFetchRequest<Image> = Image.fetchRequest()
             let predicate = NSPredicate.init(format: "toPin == %@", argumentArray: [pinForImages])
@@ -54,6 +56,20 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         catch let error as NSError {
             print("An error occured \(error) \(error.userInfo)")
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let space: CGFloat = 2.0
+        let size = self.collectionView.frame.size
+        let dimension:CGFloat = (size.width - (4 * space)) / 3.0
+        let flowLayout : UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: dimension, height: dimension)
+        flowLayout.sectionInset = UIEdgeInsets(top: space, left: space, bottom: space, right: space)
+        collectionView.collectionViewLayout = flowLayout
+        // self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: 0),at: .top, animated: false)
     }
     
     // MARK: - Controller Delegate
@@ -110,10 +126,8 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
             let sectionInfo = sections[section]
             if sectionInfo.numberOfObjects > 0 {
                 label.isHidden = true
-                print(sectionInfo.numberOfObjects)
             } else {
                 label.isHidden = false
-                print(sectionInfo.numberOfObjects)
             }
             return sectionInfo.numberOfObjects
         }
@@ -128,14 +142,22 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if editingMode {
-            let selectedImage = fetchedResultsController.object(at: indexPath)
-            stack.context.delete(selectedImage)
-            stack.save()
+            if let index = selectedIndexPaths.index(of: indexPath) {
+                selectedIndexPaths.remove(at: index)
+            } else {
+                selectedIndexPaths.append(indexPath)
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)  as! PhotoAlbumCell
+            configureCell(cell, atIndexPath: indexPath)
+            collectionView.reloadItems(at: [indexPath])
+
+            
         }
     }
     
-    // MARK: - Assist functions
     
+    // MARK: - Assist functions
+   
     func configureCell(_ cell: PhotoAlbumCell, atIndexPath indexPath: IndexPath) {
         let image = fetchedResultsController.object(at: indexPath)
         if let imageData = image.imageData {
@@ -143,9 +165,16 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         } else {
             cell.imageCell!.image = #imageLiteral(resourceName: "placeholder")
         }
+        
+        if let _ = selectedIndexPaths.index(of: indexPath) {
+            cell.alpha = 0.5
+        } else {
+            cell.alpha = 1
+        }
     }
     
-    func findPin() -> Pin? {
+    
+    func findPinInCoreData() -> Pin? {
         let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         let coordinates = [Float(pin.coordinate.latitude),Float(pin.coordinate.longitude)]
         let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
@@ -170,10 +199,17 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
                 }
             }
         }
-
     }
     
     // MARK:- Actions
+    
+    @IBAction func deleteButton(_ sender: Any) {
+        for indexPath in selectedIndexPaths {
+            let image = fetchedResultsController.object(at: indexPath) as! Image
+            stack.context.delete(image)
+        }
+        selectedIndexPaths = []
+    }
     
     @IBAction func reloadButton(_ sender: Any) {
         newData()
@@ -181,12 +217,15 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     @IBAction func editButton(_ sender: Any) {
         if editingMode {
+            selectedIndexPaths = []
+            collectionView.reloadData()
             editingMode = false
             editButton.title = "Edit"
         } else {
             editingMode = true
             editButton.title = "Done"
         }
+            deleteButton.isEnabled = editingMode
             reloadButton.isEnabled = editingMode
     }
 }

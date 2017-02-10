@@ -163,10 +163,17 @@
                                     <action selector="reloadButton:" destination="ZVr-Kf-qGO" id="QTA-7G-d2N"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem enabled="NO" title="Delete" id="gp1-MW-hpG">
+                                <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="deleteButton:" destination="ZVr-Kf-qGO" id="Ihr-mQ-FIc"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="collectionView" destination="Hgn-zA-T8J" id="CUS-W5-eH7"/>
+                        <outlet property="deleteButton" destination="gp1-MW-hpG" id="5MD-Kd-QWy"/>
                         <outlet property="editButton" destination="FMX-Fr-Yam" id="qgq-2K-bj3"/>
                         <outlet property="label" destination="QCI-9b-M0a" id="gJP-2w-qUU"/>
                         <outlet property="mapView" destination="0Bs-Q7-Fxb" id="Ra7-pC-nzQ"/>

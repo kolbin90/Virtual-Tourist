@@ -41,14 +41,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         mapView.addGestureRecognizer(gestureRecognizer)
         getAnnotationsFromCore()
         
-        
+        /*
         do{
          try stack.dropAllData()
          mapView.removeAnnotations(mapView.annotations)
          } catch {
          print("Error droping all objects in DB")
-         }
+         } */
     }
+    
+    
     
     // MARK: - MKMapViewDelegate
     // Here we create a view
