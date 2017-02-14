@@ -17,13 +17,14 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     var pin: MKAnnotation!
     let stack = (UIApplication.shared.delegate as! AppDelegate).stack
     // Keep the changes. We will keep track of insertions, deletions, and updates.
-    var insertedIndexPaths: [IndexPath]!
-    var deletedIndexPaths: [IndexPath]!
-    var updatedIndexPaths: [IndexPath]!
+    var insertedIndexPaths = [IndexPath]()
+    var deletedIndexPaths = [IndexPath]()
+    var updatedIndexPaths = [IndexPath]()
     var selectedIndexPaths = [IndexPath]()
     var pinForImages:Pin!
     var editingMode = false
     var fetchedResultsController: NSFetchedResultsController<Image>!
+    var itemCount:Int? // to resolve bug. Read more: https://fangpenlin.com/posts/2016/04/29/uicollectionview-invalid-number-of-items-crash-issue/
 
     // MARK: - Oulets
     
@@ -73,12 +74,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     }
     
     // MARK: - Controller Delegate
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        // We are about to handle some new changes. Start out with empty arrays for each change type
-        insertedIndexPaths = [IndexPath]()
-        deletedIndexPaths = [IndexPath]()
-        updatedIndexPaths = [IndexPath]()
-    }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type{
@@ -102,36 +97,59 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         DispatchQueue.main.async {
-            self.collectionView.performBatchUpdates(
+            if self.collectionView.numberOfSections == 0 {
+                self.collectionView.reloadData()
+            } else {
+                if self.updatedIndexPaths.count == 0 {
+                    self.itemCount! = self.itemCount! + self.insertedIndexPaths.count - self.deletedIndexPaths.count
+                }
+                self.collectionView.performBatchUpdates(
                 {
                     () -> Void in
                     for indexPath in self.insertedIndexPaths {
                         self.collectionView.insertItems(at: [indexPath])
+                       // self.itemCount! += 1
                     }
                     for indexPath in self.deletedIndexPaths {
                         self.collectionView.deleteItems(at: [indexPath])
+                        //self.itemCount! -= 1
                     }
                     for indexPath in self.updatedIndexPaths {
                         self.collectionView.reloadItems(at: [indexPath])
                     }
             }
                 ,completion: nil)
+                
+                self.insertedIndexPaths = [IndexPath]()
+                self.deletedIndexPaths = [IndexPath]()
+                self.updatedIndexPaths = [IndexPath]()
+        }
         }
     }
     
     // MARK: - CollectionView delegate
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let sections = fetchedResultsController.sections {
-            let sectionInfo = sections[section]
-            if sectionInfo.numberOfObjects > 0 {
+        if let items = itemCount {
+            if items > 0 {
                 label.isHidden = true
             } else {
                 label.isHidden = false
             }
-            return sectionInfo.numberOfObjects
+            return items
+        } else {
+            if let sections = fetchedResultsController.sections  {
+                let sectionInfo = sections[section]
+                if sectionInfo.numberOfObjects > 0 {
+                    label.isHidden = true
+                } else {
+                    label.isHidden = false
+                }
+                itemCount = sectionInfo.numberOfObjects
+                return itemCount!
+            }
+            return 0
         }
-        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -188,14 +206,20 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     }
     
     func newData() {
-        pinForImages.removeFromToImage(pinForImages.toImage!)
+        //pinForImages.removeFromToImage(pinForImages.toImage!)
+        let arrayOfImages = Array(pinForImages.toImage!)
+        DispatchQueue.main.async {
+            for image in arrayOfImages {
+                self.stack.context.delete(image as! NSManagedObject)
+            }
+           // self.itemCount! = 0
+            self.stack.save()
+        }
         FlickrClient.sharedInstance().getImagesFromFlickr(pin: pinForImages) { (result, error) in
-            print("Vodnikov LLIac \(result?.count)")
             DispatchQueue.main.async {
                 if let result = result {
-                    print("oi oi oi OLLIu6ka")
                     FlickrClient.sharedInstance().getImagesDataFor(pin: self.pinForImages)
-                    self.stack.save()
+                    //self.stack.save()
                 }
             }
         }
@@ -208,6 +232,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
             let image = fetchedResultsController.object(at: indexPath) as! Image
             stack.context.delete(image)
         }
+        stack.save()
         selectedIndexPaths = []
     }
     

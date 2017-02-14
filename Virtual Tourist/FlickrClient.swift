@@ -32,7 +32,7 @@ class FlickrClient: NSObject {
         getImagesURLandSetImageObjects(url: url, pin: pin) { (result, error) in
             
             
-            self.getImagesDataFor(pin: pin)
+            //self.getImagesDataFor(pin: pin)
             completionHandler(result!, nil)
         }
     }
@@ -149,10 +149,11 @@ class FlickrClient: NSObject {
                             displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
                             return
                         }
-                        print(imageUrlString)
-                        var newImage = Image.init(imageURL: imageUrlString, imageData: nil, context: self.stack.context)
-                        newImage.toPin = pin
                         urlArray.append(imageUrlString)
+                        DispatchQueue.main.async {
+                            var newImage = Image.init(imageURL: imageUrlString, imageData: nil, context: self.stack.context)
+                            newImage.toPin = pin
+                        }
                         num += 1
                     }
                     self.stack.save()
@@ -215,8 +216,11 @@ class FlickrClient: NSObject {
                 print("data error")
                 return
             }
-            image.imageData = data
-            self.stack.save()
+            DispatchQueue.main.async {
+                image.imageData = data
+                self.stack.save()
+            }
+            
         }
         task.resume()
     }

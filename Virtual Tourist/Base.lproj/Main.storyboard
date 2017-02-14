@@ -54,17 +54,19 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="bDT-Pf-Lox">
-                        <barButtonItem key="leftBarButtonItem" title="Delete" id="mVb-N1-uX4">
-                            <color key="tintColor" red="1" green="0.18333333330000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <action selector="deleteButton:" destination="nZV-ZR-Mcx" id="3An-UE-pss"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="pM0-yY-3T1">
-                            <connections>
-                                <action selector="editButton:" destination="nZV-ZR-Mcx" id="Qlx-k8-AVE"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Edit" id="pM0-yY-3T1">
+                                <connections>
+                                    <action selector="editButton:" destination="nZV-ZR-Mcx" id="Qlx-k8-AVE"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Delete" id="mVb-N1-uX4">
+                                <color key="tintColor" red="1" green="0.18333333330000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="deleteButton:" destination="nZV-ZR-Mcx" id="3An-UE-pss"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="deleteButton" destination="mVb-N1-uX4" id="64E-zY-16C"/>
