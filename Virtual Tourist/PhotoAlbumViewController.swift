@@ -219,7 +219,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
             DispatchQueue.main.async {
                 if let result = result {
                     FlickrClient.sharedInstance().getImagesDataFor(pin: self.pinForImages)
-                    //self.stack.save()
+                    self.stack.save()
                 }
             }
         }
