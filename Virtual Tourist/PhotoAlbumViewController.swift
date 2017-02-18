@@ -178,6 +178,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
    
     func configureCell(_ cell: PhotoAlbumCell, atIndexPath indexPath: IndexPath) {
         let image = fetchedResultsController.object(at: indexPath)
+        cell.imageCell?.image = nil
         if let imageData = image.imageData {
             cell.imageCell!.image = UIImage(data: imageData)
         } else {
