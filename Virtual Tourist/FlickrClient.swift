@@ -14,26 +14,42 @@ class FlickrClient: NSObject {
     
     var session = URLSession.shared
     let stack = (UIApplication.shared.delegate as! AppDelegate).stack
-
     
-
-    func getImagesFromFlickr(long: Float, lat: Float, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+    
+    
+    func getImagesFromFlickr(pin:Pin, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
+        
         //creating serching box from long and lat
-        let minimumLon = max(Double(long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
-        let minimumLat = max(Double(lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
-        let maximumLon = min(Double(long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
-        let maximumLat = min(Double(lat) + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
+        let minimumLon = max(Double(pin.long) - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
+        let minimumLat = max(Double(pin.lat) - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
+        let maximumLon = min(Double(pin.long) + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
+        let maximumLat = min(Double(pin.lat) + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
         let bbox =  "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
         //creating array of methid parameters
-        let methodParameters = setMethodParameters(bbox: bbox)
+        let methodParameters = setMethodParameters(bbox: bbox) as [String:AnyObject]
         //creating url for request
         let url = flickrURLFromParameters(parameters: methodParameters)
-        displayImageFromFlickrBySearch(url: url) { (result, error) in
-            
-            
-            
-            completionHandler(result!, nil)
+        getPagesNumber(url: url) { result, error in
+            guard let pages = result else {
+                print("error")
+                return
+            }
+            let maxPages = 4000 / Int(Constants.FlickrParameterValues.PerPage)!
+            let pageLimit = min(pages, maxPages)
+            let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
+            var methodParametersWithPageNumber = methodParameters
+            methodParametersWithPageNumber[Constants.FlickrParameterKeys.Page] = randomPage as AnyObject?
+            var urlWithPageNumber = self.flickrURLFromParameters(parameters: methodParametersWithPageNumber)
+            print(urlWithPageNumber)
+            self.getImagesURLandSetImageObjects(url: urlWithPageNumber, pin: pin) { (result, error) in
+                guard let result = result else {
+                    return
+                }
+                completionHandler(result, nil)
+            }
         }
+        
+        
     }
     
     
@@ -54,7 +70,6 @@ class FlickrClient: NSObject {
     
     func setMethodParameters(bbox:String) -> [String : AnyObject] {
         
-        //        setUIEnabled(false)
         let methodParameters = [
             Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
             Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
@@ -62,7 +77,8 @@ class FlickrClient: NSObject {
             Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
             Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
             Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
+            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
+            Constants.FlickrParameterKeys.PerPage: Constants.FlickrParameterValues.PerPage
         ]
         return methodParameters as [String : AnyObject]
         //  displayImageFromFlickrBySearch(methodParameters: methodParameters as [String : AnyObject])
@@ -71,11 +87,76 @@ class FlickrClient: NSObject {
     
     
     
-    func displayImageFromFlickrBySearch(url: URL, completionHandler: @escaping (_ result: [NSData]?, _ error: NSError?) -> Void) {
+    func getImagesURLandSetImageObjects(url: URL,pin:Pin, completionHandler: @escaping (_ result: [String]?, _ error: NSError?) -> Void) {
+        
+        var urlArray = [String]()
+        getDataFromFlickr(url: url) { result, error in
+            
+            guard let photosDictionary = result else {
+                print("\(error)")
+                return
+            }
+            guard let photosArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
+                print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(photosDictionary)")
+                return
+            }
+            if photosArray.count == 0 {
+                print("No Photos Found. Search Again.")
+                return
+            } else {
+                var numOfPicForDownload = 21
+                if photosArray.count < numOfPicForDownload {
+                    numOfPicForDownload = photosArray.count
+                }
+                var num = 0
+                while num < numOfPicForDownload {
+                    let photoDictionary = photosArray[num] as [String: AnyObject]
+                    let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
+                    print(photoTitle)
+                    
+                    /* GUARD: Does our photo have a key for 'url_m'? */
+                    guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
+                        print("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
+                        return
+                    }
+                    urlArray.append(imageUrlString)
+                    DispatchQueue.main.async {
+                        var newImage = Image.init(imageURL: imageUrlString, imageData: nil, context: self.stack.context)
+                        newImage.toPin = pin
+                    }
+                    num += 1
+                }
+                self.stack.save()
+                completionHandler(urlArray, nil)
+            }
+            
+            
+        }
+    }
+    
+    
+    func getPagesNumber(url:URL,completionHandler: @escaping (_ result: Int?, _ error: NSError?) -> Void) {
+        getDataFromFlickr(url: url) { result, error in
+
+            /* GUARD: Is "pages" key in the photosDictionary? */
+            guard let result = result else {
+                return
+            }
+            guard let totalPages = result[Constants.FlickrResponseKeys.Pages] as? Int else {
+                print("Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(result)")
+                return
+            }
+            completionHandler(totalPages,nil)
+        }
+    }
+    
+    
+    
+    
+    func getDataFromFlickr(url: URL, completionHandler: @escaping (_ result: [String:AnyObject]?, _ error: NSError?) -> Void) {
         
         // create session and reques)t
         let request = URLRequest(url: url)
-        var dataArray = [NSData]()
         
         
         // create network request
@@ -109,61 +190,23 @@ class FlickrClient: NSObject {
             // parse the data
             self.convertDataWithCompletionHandler(data: data) { (result, error) in
                 guard (error == nil) else {
-                 //    completionHandler(nil, "Data error. Try again later")
+                    //    completionHandler(nil, "Data error. Try again later")
                     return
                 }
                 guard let result = result else {
-                //    completionHandler(nil,"Data error. Try again later")
+                    //    completionHandler(nil,"Data error. Try again later")
                     return
                 }
                 guard let photosDictionary = result[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
                     displayError(error: "Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(result)")
                     return
                 }
-                /* GUARD: Is "pages" key in the photosDictionary? */
-                guard let totalPages = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
-                    displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photosDictionary)")
-                    return
-                }
-                guard let photosArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
-                    displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(photosDictionary)")
-                    return
-                }
-                
-                if photosArray.count == 0 {
-                    displayError(error: "No Photos Found. Search Again.")
-                    return
-                } else {
-                    var numOfPicForDownload = 21
-                    if photosArray.count < numOfPicForDownload {
-                        numOfPicForDownload = photosArray.count
-                    }
-                    var num = 0
-                    while num < numOfPicForDownload {
-                        let photoDictionary = photosArray[num] as [String: AnyObject]
-                        let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                        print(photoTitle)
-                        
-                        /* GUARD: Does our photo have a key for 'url_m'? */
-                        guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
-                            displayError(error: "Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
-                            return
-                        }
-                        print(imageUrlString)
-                        let imageURL = URL(string: imageUrlString)
-                        if let imageData = NSData(contentsOf: imageURL!) {
-                                dataArray.append(imageData)
-                        } else {
-                            displayError(error: "Image does not exist at \(imageURL)")
-                        }
-                        num += 1
-                    }
-                    completionHandler(dataArray, nil)
-                }
+                completionHandler(photosDictionary, nil)
             }
         }
         task.resume()
     }
+    
     
     // MARK: - assist functions
     func convertDataWithCompletionHandler(data: Data, completionHandlerForConvertData: (_ result: AnyObject?, _ error: NSError?) -> Void) {
@@ -177,26 +220,32 @@ class FlickrClient: NSObject {
         completionHandlerForConvertData(parsedResult, nil)
     }
     
-    
-    func saveToCore(imagesData imagesDataArray:[NSData], forPin:MKAnnotation) {
-        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let coordinates = [Float(forPin.coordinate.latitude),Float(forPin.coordinate.longitude)]
-        let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
-        fr.predicate = predicate
-        if let result = try? stack.context.fetch(fr) {
-            for object in result {
-                for imageData in imagesDataArray {
-                    let image = Image.init(imageData: imageData as Data, context: stack.context) as Image
-                    image.toPin = object as? Pin
-                }
-                stack.save()
-            }
-        } else {
-            print("error with fetching")
+    func getImagesDataFor(pin:Pin) {
+        let imagesArray = Array(pin.toImage!)
+        for image in imagesArray {
+            getImageDataFor(image: image as! Image)
         }
     }
     
-    
+    func getImageDataFor(image:Image) {
+        let url = URL(string: image.imageURL)!
+        let request = URLRequest(url: url)
+        let task = session.dataTask(with: request) { (data, response, error) in
+            guard (error == nil) else {
+                print("There was an error with the task for image")
+                return
+            }
+            guard let data = data else {
+                print("data error")
+                return
+            }
+            DispatchQueue.main.async {
+                image.imageData = data
+                self.stack.save()
+            }
+        }
+        task.resume()
+    }
     
     // MARK: -  Singleton
     

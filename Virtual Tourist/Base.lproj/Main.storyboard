@@ -54,17 +54,19 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="bDT-Pf-Lox">
-                        <barButtonItem key="leftBarButtonItem" title="Delete" id="mVb-N1-uX4">
-                            <color key="tintColor" red="1" green="0.18333333330000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <action selector="deleteButton:" destination="nZV-ZR-Mcx" id="3An-UE-pss"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="pM0-yY-3T1">
-                            <connections>
-                                <action selector="editButton:" destination="nZV-ZR-Mcx" id="Qlx-k8-AVE"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Edit" id="pM0-yY-3T1">
+                                <connections>
+                                    <action selector="editButton:" destination="nZV-ZR-Mcx" id="Qlx-k8-AVE"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Delete" id="mVb-N1-uX4">
+                                <color key="tintColor" red="1" green="0.18333333330000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="deleteButton:" destination="nZV-ZR-Mcx" id="3An-UE-pss"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="deleteButton" destination="mVb-N1-uX4" id="64E-zY-16C"/>
@@ -89,10 +91,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="0Bs-Q7-Fxb">
-                                <rect key="frame" x="0.0" y="64" width="375" height="266"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="265" id="gMT-Bw-8pl"/>
-                                </constraints>
+                                <rect key="frame" x="0.0" y="64" width="375" height="265"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Hgn-zA-T8J">
                                 <rect key="frame" x="0.0" y="338" width="375" height="321"/>
@@ -103,6 +102,13 @@
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
+                                <label key="backgroundView" hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No images for this pin." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QCI-9b-M0a">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="321"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="jvP-q5-0eT" customClass="PhotoAlbumCell" customModule="Virtual_Tourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="106" height="92"/>
@@ -111,7 +117,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="106" height="92"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qR1-f9-uJL">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qR1-f9-uJL">
                                                     <rect key="frame" x="8" y="-18" width="90" height="128"/>
                                                 </imageView>
                                             </subviews>
@@ -135,6 +141,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="0Bs-Q7-Fxb" firstAttribute="height" secondItem="Hgn-zA-T8J" secondAttribute="height" id="0FL-YM-kAf"/>
                             <constraint firstItem="Hgn-zA-T8J" firstAttribute="top" secondItem="0Bs-Q7-Fxb" secondAttribute="bottom" id="2ZO-Os-t9d"/>
                             <constraint firstItem="0Bs-Q7-Fxb" firstAttribute="top" secondItem="aKh-PM-7JT" secondAttribute="bottom" id="EAu-F4-9S9"/>
                             <constraint firstItem="0Bs-Q7-Fxb" firstAttribute="leading" secondItem="sVE-yi-dVK" secondAttribute="leading" id="GpJ-XI-l99"/>
@@ -158,11 +165,19 @@
                                     <action selector="reloadButton:" destination="ZVr-Kf-qGO" id="QTA-7G-d2N"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem enabled="NO" title="Delete" id="gp1-MW-hpG">
+                                <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="deleteButton:" destination="ZVr-Kf-qGO" id="Ihr-mQ-FIc"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="collectionView" destination="Hgn-zA-T8J" id="CUS-W5-eH7"/>
+                        <outlet property="deleteButton" destination="gp1-MW-hpG" id="5MD-Kd-QWy"/>
                         <outlet property="editButton" destination="FMX-Fr-Yam" id="qgq-2K-bj3"/>
+                        <outlet property="label" destination="QCI-9b-M0a" id="gJP-2w-qUU"/>
                         <outlet property="mapView" destination="0Bs-Q7-Fxb" id="Ra7-pC-nzQ"/>
                         <outlet property="reloadButton" destination="BEK-cr-WXg" id="ngm-el-KQE"/>
                     </connections>

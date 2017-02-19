@@ -41,14 +41,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         mapView.addGestureRecognizer(gestureRecognizer)
         getAnnotationsFromCore()
         
-        
-        /* do{
+        /*
+        do{
          try stack.dropAllData()
          mapView.removeAnnotations(mapView.annotations)
          } catch {
          print("Error droping all objects in DB")
-         }*/
+         } */
     }
+    
+    
     
     // MARK: - MKMapViewDelegate
     // Here we create a view
@@ -126,7 +128,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
     
     // MARK: - Annotations
- 
+    
     func addAnnotation(gestureRecognizer:UIGestureRecognizer) {
         guard editingMode == false else {
             return
@@ -137,18 +139,19 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let newCoordinates = self.mapView.convert(touchPoint, toCoordinateFrom: self.mapView)
             let lat = Float(newCoordinates.latitude)
             let long = Float(newCoordinates.longitude)
-            Pin(long: long, lat: lat, context: stack.context)
             let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             self.mapView.addAnnotation(annotation)
-            FlickrClient.sharedInstance().getImagesFromFlickr(long: long, lat: lat) { (result, error) in
-                print("Vodnikov LLIac \(result?.count)")
-                DispatchQueue.main.async {
-                    if let result = result {
-                        print("oi oi oi OLLIu6ka")
-                        FlickrClient.sharedInstance().saveToCore(imagesData: result, forPin: annotation)
-                        self.stack.save()
-
+            DispatchQueue.main.async {
+                let newPin = Pin(long: long, lat: lat, context: self.stack.context)
+                self.stack.save()
+                FlickrClient.sharedInstance().getImagesFromFlickr(pin: newPin) { (result, error) in
+                    DispatchQueue.main.async {
+                        if let result = result {
+                            FlickrClient.sharedInstance().getImagesDataFor(pin: newPin)
+                            self.stack.save()
+                            
+                        }
                     }
                 }
             }
@@ -182,9 +185,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let predicate = NSPredicate.init(format: "(lat == %@) AND (long == %@)", argumentArray: coordinates)
             fr.predicate = predicate
             if let result = try? stack.context.fetch(fr) {
-                print("try? stack.context.f")
                 for object in result {
-                    print("for object in result")
                     print(object)
                     stack.context.delete(object as! NSManagedObject)
                 }
