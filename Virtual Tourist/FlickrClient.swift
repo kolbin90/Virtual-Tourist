@@ -39,7 +39,7 @@ class FlickrClient: NSObject {
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
             var methodParametersWithPageNumber = methodParameters
             methodParametersWithPageNumber[Constants.FlickrParameterKeys.Page] = randomPage as AnyObject?
-            var urlWithPageNumber = self.flickrURLFromParameters(parameters: methodParametersWithPageNumber)
+            let urlWithPageNumber = self.flickrURLFromParameters(parameters: methodParametersWithPageNumber)
             print(urlWithPageNumber)
             self.getImagesURLandSetImageObjects(url: urlWithPageNumber, pin: pin) { (result, error) in
                 guard let result = result else {
@@ -81,7 +81,6 @@ class FlickrClient: NSObject {
             Constants.FlickrParameterKeys.PerPage: Constants.FlickrParameterValues.PerPage
         ]
         return methodParameters as [String : AnyObject]
-        //  displayImageFromFlickrBySearch(methodParameters: methodParameters as [String : AnyObject])
     }
     
     
@@ -112,7 +111,6 @@ class FlickrClient: NSObject {
                 while num < numOfPicForDownload {
                     let photoDictionary = photosArray[num] as [String: AnyObject]
                     let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                    print(photoTitle)
                     
                     /* GUARD: Does our photo have a key for 'url_m'? */
                     guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {

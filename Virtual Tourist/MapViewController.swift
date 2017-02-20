@@ -40,14 +40,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let gestureRecognizer = UILongPressGestureRecognizer(target: self, action:#selector(addAnnotation(gestureRecognizer:)))
         mapView.addGestureRecognizer(gestureRecognizer)
         getAnnotationsFromCore()
-        
-        /*
-        do{
-         try stack.dropAllData()
-         mapView.removeAnnotations(mapView.annotations)
-         } catch {
-         print("Error droping all objects in DB")
-         } */
     }
     
     
@@ -147,7 +139,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 self.stack.save()
                 FlickrClient.sharedInstance().getImagesFromFlickr(pin: newPin) { (result, error) in
                     DispatchQueue.main.async {
-                        if let result = result {
+                        if result != nil {
                             FlickrClient.sharedInstance().getImagesDataFor(pin: newPin)
                             self.stack.save()
                             
@@ -173,7 +165,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             }
             self.mapView.addAnnotations(annotations)
         }  catch {
-            print("ebat oshibka")
+            print("error")
         }
     }
     
@@ -186,7 +178,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             fr.predicate = predicate
             if let result = try? stack.context.fetch(fr) {
                 for object in result {
-                    print(object)
                     stack.context.delete(object as! NSManagedObject)
                 }
             } else {

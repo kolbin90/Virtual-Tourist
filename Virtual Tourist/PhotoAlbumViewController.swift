@@ -70,7 +70,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
         flowLayout.sectionInset = UIEdgeInsets(top: space, left: space, bottom: space, right: space)
         collectionView.collectionViewLayout = flowLayout
-        // self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: 0),at: .top, animated: false)
     }
     
     // MARK: - Controller Delegate
@@ -207,18 +206,16 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     }
     
     func newData() {
-        //pinForImages.removeFromToImage(pinForImages.toImage!)
         let arrayOfImages = Array(pinForImages.toImage!)
         DispatchQueue.main.async {
             for image in arrayOfImages {
                 self.stack.context.delete(image as! NSManagedObject)
             }
-           // self.itemCount! = 0
             self.stack.save()
         }
         FlickrClient.sharedInstance().getImagesFromFlickr(pin: pinForImages) { (result, error) in
             DispatchQueue.main.async {
-                if let result = result {
+                if (result != nil) {
                     FlickrClient.sharedInstance().getImagesDataFor(pin: self.pinForImages)
                     self.stack.save()
                 }
@@ -230,7 +227,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     @IBAction func deleteButton(_ sender: Any) {
         for indexPath in selectedIndexPaths {
-            let image = fetchedResultsController.object(at: indexPath) as! Image
+            let image = fetchedResultsController.object(at: indexPath) 
             stack.context.delete(image)
         }
         stack.save()
